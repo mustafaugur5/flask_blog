@@ -73,17 +73,36 @@ def save_picture(form_picture):
     i.save(picture_path)
 
     return picture_fn
-
+    
 #takes picture and username and creates a default user
+#Input pictur should be opened using Image.open() from PIL Image
 def default_profile(picture,username):
-    piccc=save_picture(picture)
+ #   piccc=save_picture(picture)
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    output_size = (125, 125)
+    picture.thumbnail(output_size)
+    picture.save(picture_path)
+
     mail = username + '@demo.com'
-    user=User(username=username,email=mail,password='deneme',image_file=piccc)
+    password='deneme'
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    user=User(username=username,email=mail,password=hashed_password,image_file=picture_fn)
     db.session.add(user)
-    db.session.commit
+    db.session.commit()
 
+# Create feeding log for given cat
+def postt(username):
+    user=User.query.filter_by(username=username).first()
+    content= str(user.feed_amount) + ' g of food given '
+    title= user.username + "'s feeding log"
+    post=Post(title=title,content=content,user_id=user.id)
+    db.session.add(post)
+    db.session.commit()
 
-
+    
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
