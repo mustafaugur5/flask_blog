@@ -74,6 +74,15 @@ def save_picture(form_picture):
 
     return picture_fn
 
+#takes picture and username and creates a default user
+def default_profile(picture,username):
+    piccc=save_picture(picture)
+    mail = username + '@demo.com'
+    user=User(username=username,email=mail,password='deneme',image_file=piccc)
+    db.session.add(user)
+    db.session.commit
+
+
 
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
