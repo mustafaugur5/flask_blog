@@ -101,6 +101,15 @@ def postt(username):
     post=Post(title=title,content=content,user_id=user.id)
     db.session.add(post)
     db.session.commit()
+    
+def is_feed_time(username):
+    user=User.query.filter_by(username=username).first()
+
+    p=Post.query.order_by(Post.date_posted.desc()).filter_by(user_id=user.id).first()   
+    z=p.date_posted
+    a=datetime.utcnow()
+    c=(a.month-z.month)*24*30+(a.day-z.day)*24+a.hour-z.hour #Will return total hour difference
+    return c>user.feed_period     
 
     
 @app.route("/account", methods=['GET', 'POST'])
